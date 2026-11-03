@@ -1,0 +1,124 @@
+name: Sync and Deliver Upstream Preview
+
+on:
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: upstream-preview-delivery
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    name: Check for an undelivered upstream prerelease
+    if: github.repository == '7ac9d42/InstallerX-Revived'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      should_build: ${{ steps.preview.outputs.should_build }}
+      source_sha: ${{ steps.preview.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Check automation scripts
+        run: python3 -I -m unittest discover -s .github/scripts/tests -v
+
+      - name: Resolve upstream prerelease and delivery state
+        id: preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -I .github/scripts/preview-automation.py detect \
+            --output preview --github-output "$GITHUB_OUTPUT"
+
+      - name: Save prerelease snapshot
+        if: steps.preview.outputs.should_build == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: upstream-preview
+          path: preview/*.json
+          if-no-files-found: error
+          retention-days: 30
+
+  sync:
+    name: Sync the published source while preserving fork CI
+    needs: detect
+    if: needs.detect.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          path: fork
+
+      - name: Merge the prerelease commit
+        env:
+          SOURCE_SHA: ${{ needs.detect.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          git -C fork config user.name 'github-actions[bot]'
+          git -C fork config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python3 -I fork/.github/scripts/sync-preview.py --repo-dir fork --source-sha "$SOURCE_SHA"
+          git -C fork push origin HEAD:main
+
+  build:
+    name: Build the published AOSP version
+    needs: [detect, sync]
+    if: needs.detect.outputs.should_build == 'true'
+    uses: ./.github/workflows/aosp-module.yml
+    with:
+      source_ref: ${{ needs.detect.outputs.source_sha }}
+      expected_sha: ${{ needs.detect.outputs.source_sha }}
+      release_artifact: upstream-preview
+    secrets:
+      SIGNING_KEY_STORE_BASE64: ${{ secrets.SIGNING_KEY_STORE_BASE64 }}
+      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+  deliver:
+    name: Send the AOSP APK and upstream changelog to Telegram
+    needs: [detect, build]
+    if: needs.detect.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: ci
+          persist-credentials: false
+
+      - name: Download prerelease snapshot
+        uses: actions/download-artifact@v8
+        with:
+          name: upstream-preview
+          path: preview
+
+      - name: Download verified AOSP artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: installerx-aosp-${{ github.run_number }}
+          path: dist
+
+      - name: Deliver APK and changelog with checkpoints
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          CHATID: ${{ secrets.CHATID }}
+        run: |
+          python3 -I ci/.github/scripts/send-telegram.py \
+            --release preview/release.json --state preview/delivery-state.json \
+            --artifacts dist --state-helper ci/.github/scripts/preview-automation.py

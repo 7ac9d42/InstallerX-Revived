@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
   pre_job:
+    if: github.repository == 'wxxsfxyzm/InstallerX-Revived'
     name: Duplicate Check
     runs-on: ubuntu-latest
     permissions:

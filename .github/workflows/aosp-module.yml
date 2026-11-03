@@ -8,6 +8,26 @@ on:
         required: true
         default: 'main'
         type: string
+  workflow_call:
+    inputs:
+      source_ref:
+        required: true
+        type: string
+      expected_sha:
+        required: true
+        type: string
+      release_artifact:
+        required: true
+        type: string
+    secrets:
+      SIGNING_KEY_STORE_BASE64:
+        required: true
+      SIGNING_STORE_PASSWORD:
+        required: true
+      SIGNING_KEY_ALIAS:
+        required: true
+      SIGNING_KEY_PASSWORD:
+        required: true
 
 permissions:
   contents: read
@@ -46,6 +66,23 @@ jobs:
           path: source
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Verify requested source commit
+        if: inputs.expected_sha != ''
+        working-directory: source
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+
+      - name: Download prerelease snapshot
+        if: inputs.release_artifact != ''
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.release_artifact }}
+          path: preview
 
       - name: Set up JDK 25
         uses: actions/setup-java@v6
@@ -93,6 +130,19 @@ jobs:
             --template ci/.github/aosp-module \
             --build-tools "$ANDROID_HOME/build-tools/37.0.0" \
             --output dist
+
+      - name: Record build provenance
+        env:
+          CONFIGURATION_SHA: ${{ github.sha }}
+          RELEASE_ARTIFACT: ${{ inputs.release_artifact }}
+        run: |
+          set -euo pipefail
+          extra=()
+          if [[ -n "$RELEASE_ARTIFACT" ]]; then
+            extra=(--release preview/release.json)
+          fi
+          python3 -I ci/.github/scripts/preview-automation.py add-metadata \
+            --artifacts dist --configuration-sha "$CONFIGURATION_SHA" "${extra[@]}"
           cat dist/build-info.json >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload APK and flashable module

@@ -9,6 +9,7 @@ on:
 
 jobs:
   build_and_release:
+    if: github.repository == 'wxxsfxyzm/InstallerX-Revived'
     name: Build Draft Release
     runs-on: ubuntu-latest
     permissions:

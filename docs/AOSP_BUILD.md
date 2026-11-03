@@ -1,8 +1,35 @@
 # AOSP APK 与系统替换模块
 
-此 fork 增加手动工作流 **AOSP APK and Module**，不修改上游应用代码。
+此 fork 提供手动工作流 **AOSP APK and Module** 和自动工作流
+**Sync and Deliver Upstream Preview**，不修改上游应用代码。
 
-## 构建
+## 自动同步与 Telegram 交付
+
+每 30 分钟（UTC 每小时第 17、47 分钟）检查上游新预发布，也可手动运行检查。
+只有发现尚未交付的预发布才同步、构建和发送。上游 main 的普通提交不触发这些操作。
+GitHub 调度可能延迟，不保证发布后即时到达。
+
+自动流程先保存预发布正文，再将标签解析为完整提交，fork main 也只同步到这个提交。
+同步采用正常合并，保留 fork 的 `.github/workflows/`、`.github/scripts/`、
+`.github/aosp-module/` 和本说明；上游新增的工作流不会混入。
+保护路径以外的源码冲突会停止同步，不强推。继承的上游普通包发布流程已禁用。
+
+AOSP 构建沿用现有固定签名，Telegram 只发送校验后的 AOSP APK，
+并附上游该次预发布的“更新日志（Changelog）”节及 Full Changelog 链接。
+模块和其他校验产物保留在 Actions，不发送 Telegram。
+较短日志放在 APK caption 中；超过 Telegram 限制时分成后续完整日志消息。
+
+Telegram 使用 Repository Secrets `TG_BOT_TOKEN` 和 `CHATID`，不需要 Telethon session。
+Secrets 只提供给发送步骤，日志不输出其值。构建信息记录预发布来源、源码提交和 CI 配置提交。
+
+独立 `automation-state` 分支保存按源码完整 SHA 索引的交付检查点，不影响应用版本码。
+相同提交已交付后不再重复发送，即使上游删除重建了预发布。
+明确失败可以手动重跑检查，恢复未完成消息；发送结果不明时保留 `pending_index` 并停止，
+需要先核实 Telegram 实际接收情况再修正对应状态，避免重复发送。
+
+首次部署会用当前预发布实际发送一次 APK 与对应日志，随后检查应跳过同一提交。
+
+## 手动构建
 
 在 Actions 中选择该工作流，点击 Run workflow。`source_ref` 为上游
 `wxxsfxyzm/InstallerX-Revived` 的分支、标签或提交，默认为 `main`。
