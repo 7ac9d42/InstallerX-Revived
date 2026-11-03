@@ -1,0 +1,18 @@
+{
+  "source_sha": "35d7c7a06e86b280789a171d8b213becac1a0fd7",
+  "release": {
+    "id": 418459680,
+    "tag_name": "26.10.35d7c7a",
+    "html_url": "https://github.com/wxxsfxyzm/InstallerX-Revived/releases/tag/26.10.35d7c7a",
+    "body": "## 这是自动构建的最新测试版。\n- **这是一个预发布版本，并非为生产环境准备就绪。**\n- 我们非常鼓励您分享您的看法！\n\n## This is an automatically built latest Preview release.\n- **This is a pre-release version and is not intended for production use.**\n- We appreciate any feedback!\n\n**更新日志（Changelog）:**\n- i18n: Translations update from Hosted Weblate (#870) (Weblate (bot))\n- feat: route app info intents to the uninstall flow (wxxsfxyzm)\n- feat: add AOSP signature badges with signing key details (wxxsfxyzm)\n- i18n: Translations update from Hosted Weblate (#854) (Weblate (bot))\n- feat: Add source stamp verification and bug fixes (#867) (wxxsfxyzm)\n\n**Full Changelog:** [`26.09...26.10.35d7c7a`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.10.35d7c7a)\n",
+    "source_sha": "35d7c7a06e86b280789a171d8b213becac1a0fd7",
+    "changelog": "更新日志（Changelog）：\n- i18n: Translations update from Hosted Weblate (#870) (Weblate (bot))\n- feat: route app info intents to the uninstall flow (wxxsfxyzm)\n- feat: add AOSP signature badges with signing key details (wxxsfxyzm)\n- i18n: Translations update from Hosted Weblate (#854) (Weblate (bot))\n- feat: Add source stamp verification and bug fixes (#867) (wxxsfxyzm)\n\n**Full Changelog:** [`26.09...26.10.35d7c7a`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.10.35d7c7a)"
+  },
+  "status": "pending",
+  "delivery": {
+    "next_index": 0,
+    "pending_index": 0,
+    "message_ids": [],
+    "payload_sha256": "6d6cb0ef6302724aaaa634b50c1c748ffa4a5282261b11503a5365887d577eb1"
+  }
+}
