@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -89,11 +90,12 @@ def main():
         permission_block = permission_root.find('privapp-permissions')
         if permission_block.attrib['package'] != metadata['applicationId']:
             raise ValueError('Privilege allowlist package does not match APK')
+        archive_time = datetime.now(timezone.utc).timetuple()[:6]
         with zipfile.ZipFile(module_output, 'w', zipfile.ZIP_DEFLATED) as archive:
             for path in sorted(module.rglob('*')):
                 if path.is_file():
                     relative = path.relative_to(module).as_posix()
-                    info = zipfile.ZipInfo(relative)
+                    info = zipfile.ZipInfo(relative, date_time=archive_time)
                     info.create_system = 3
                     executable = relative.endswith('.sh') or relative.endswith('/update-binary')
                     info.external_attr = (0o100755 if executable else 0o100644) << 16
