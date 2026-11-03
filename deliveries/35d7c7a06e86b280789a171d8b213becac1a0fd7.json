@@ -8,7 +8,7 @@
     "source_sha": "35d7c7a06e86b280789a171d8b213becac1a0fd7",
     "changelog": "更新日志（Changelog）：\n- i18n: Translations update from Hosted Weblate (#870) (Weblate (bot))\n- feat: route app info intents to the uninstall flow (wxxsfxyzm)\n- feat: add AOSP signature badges with signing key details (wxxsfxyzm)\n- i18n: Translations update from Hosted Weblate (#854) (Weblate (bot))\n- feat: Add source stamp verification and bug fixes (#867) (wxxsfxyzm)\n\n**Full Changelog:** [`26.09...26.10.35d7c7a`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.10.35d7c7a)"
   },
-  "status": "pending",
+  "status": "complete",
   "delivery": {
     "next_index": 1,
     "pending_index": null,
