@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="com.android.packageinstaller">
+        <permission name="android.permission.INSTALL_PACKAGES" />
+        <permission name="android.permission.DELETE_PACKAGES" />
+        <permission name="android.permission.MANAGE_USERS" />
+        <permission name="android.permission.READ_INSTALL_SESSIONS" />
+        <permission name="android.permission.READ_INSTALLED_SESSION_PATHS" />
+        <permission name="android.permission.UPDATE_APP_OPS_STATS" />
+        <permission name="android.permission.MANAGE_APP_OPS_MODES" />
+    </privapp-permissions>
+</permissions>

@@ -1,0 +1,122 @@
+name: AOSP APK and Module
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Upstream branch, tag, or commit to build'
+        required: true
+        default: 'main'
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: aosp-module-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build signed AOSP Release APK and module
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout packaging configuration
+        uses: actions/checkout@v7
+        with:
+          path: ci
+          persist-credentials: false
+
+      - name: Validate module scripts
+        run: |
+          bash -n ci/.github/aosp-module/customize.sh
+          bash -n ci/.github/aosp-module/action.sh
+          bash -n ci/.github/aosp-module/META-INF/com/google/android/update-binary
+
+      - name: Checkout upstream source
+        uses: actions/checkout@v7
+        with:
+          repository: wxxsfxyzm/InstallerX-Revived
+          ref: ${{ inputs.source_ref }}
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: '25'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 37 tools
+        run: sdkmanager 'platforms;android-37' 'build-tools;37.0.0'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          build-scan-publish: false
+          cache-read-only: false
+
+      - name: Prepare fixed signing key
+        env:
+          SIGNING_KEY_STORE_BASE64: ${{ secrets.SIGNING_KEY_STORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          : "${SIGNING_KEY_STORE_BASE64:?Missing signing keystore secret}"
+          : "${KEYSTORE_PASSWORD:?Missing signing store password secret}"
+          : "${KEY_ALIAS:?Missing signing alias secret}"
+          : "${KEY_PASSWORD:?Missing signing key password secret}"
+          umask 077
+          printf '%s' "$SIGNING_KEY_STORE_BASE64" | base64 --decode > "$RUNNER_TEMP/installerx-aosp.p12"
+
+      - name: Build AOSP Preview Release
+        working-directory: source
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEYSTORE_FILE: ${{ runner.temp }}/installerx-aosp.p12
+          KEYSTORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: bash ./gradlew assemblePreviewRelease --no-daemon --no-configuration-cache -PAPP_ID=com.android.packageinstaller
+
+      - name: Verify APK and package module
+        run: |
+          set -euo pipefail
+          python3 -I ci/.github/scripts/package-aosp.py \
+            --source source \
+            --template ci/.github/aosp-module \
+            --build-tools "$ANDROID_HOME/build-tools/37.0.0" \
+            --output dist
+          cat dist/build-info.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload APK and flashable module
+        uses: actions/upload-artifact@v7
+        with:
+          name: installerx-aosp-${{ github.run_number }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload R8 mapping
+        uses: actions/upload-artifact@v7
+        with:
+          name: installerx-aosp-mapping-${{ github.run_number }}
+          path: source/app/build/outputs/mapping/**/mapping.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/installerx-aosp.p12"
