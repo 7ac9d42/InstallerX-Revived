@@ -113,7 +113,17 @@ jobs:
           name: installerx-aosp-${{ github.run_number }}
           path: dist
 
+      - name: Refresh delivery state before sending or retrying
+        id: delivery_state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -I ci/.github/scripts/preview-automation.py refresh-state \
+            --release preview/release.json --state preview/delivery-state.json \
+            --github-output "$GITHUB_OUTPUT"
+
       - name: Deliver APK and changelog with checkpoints
+        if: steps.delivery_state.outputs.should_send == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}

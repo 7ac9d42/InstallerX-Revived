@@ -115,6 +115,45 @@ class PreviewTests(unittest.TestCase):
         decoded = json.loads(base64.b64decode(saved['content']))
         self.assertEqual('pending', decoded['status'])
 
+    def test_stale_artifact_cannot_repeat_an_unknown_request(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            automation.detect('example/fork', output, api=self.detect_api())
+            state_path = output / 'delivery-state.json'
+            state = json.loads(state_path.read_text(encoding='utf-8'))
+            state['delivery']['pending_index'] = 0
+            state_path.write_text(json.dumps(state), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'already pending'):
+                automation.save_state('example/fork', output / 'release.json', state_path, self.detect_api(state))
+            with self.assertRaisesRegex(ValueError, 'unknown'):
+                automation.refresh_state('example/fork', output / 'release.json', state_path, api=self.detect_api(state))
+
+    def test_refresh_restores_confirmed_progress(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            automation.detect('example/fork', output, api=self.detect_api())
+            state_path = output / 'delivery-state.json'
+            state = json.loads(state_path.read_text(encoding='utf-8'))
+            state['delivery'].update(next_index=1, message_ids=[123])
+            self.assertTrue(automation.refresh_state(
+                'example/fork', output / 'release.json', state_path, api=self.detect_api(state),
+            ))
+            self.assertEqual([123], json.loads(state_path.read_text(encoding='utf-8'))['delivery']['message_ids'])
+
+    def test_refresh_skips_completed_delivery_on_job_rerun(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            automation.detect('example/fork', output, api=self.detect_api())
+            state_path = output / 'delivery-state.json'
+            state = json.loads(state_path.read_text(encoding='utf-8'))
+            state['status'] = 'complete'
+            state['delivery'].update(next_index=1, message_ids=[123])
+            github_output = output / 'outputs'
+            self.assertFalse(automation.refresh_state(
+                'example/fork', output / 'release.json', state_path, github_output, self.detect_api(state),
+            ))
+            self.assertIn('should_send=false', github_output.read_text())
+
     def test_build_metadata_rejects_other_source(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)

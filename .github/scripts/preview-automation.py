@@ -153,6 +153,9 @@ def save_state(repository, release_path, state_path, api=github_api):
     if state['status'] == 'complete' and (delivery['pending_index'] is not None or not delivery['message_ids']):
         raise ValueError('Cannot complete an unconfirmed Telegram delivery')
     existing, blob_sha = read_state(repository, source_sha, api)
+    if (existing is not None and existing['delivery']['pending_index'] is not None
+            and delivery['pending_index'] is not None):
+        raise ValueError('A Telegram request is already pending; refusing to repeat it')
     if existing == state:
         return
     if existing is not None:
@@ -171,6 +174,26 @@ def save_state(repository, release_path, state_path, api=github_api):
         data['sha'] = blob_sha
     api('PUT', f'repos/{repository}/contents/deliveries/{source_sha}.json', data)
     print(f'Saved delivery checkpoint for {source_sha[:7]}: {state["status"]}')
+
+
+def refresh_state(repository, release_path, state_path, output_file=None, api=github_api):
+    release = json.loads(release_path.read_text(encoding='utf-8'))
+    source_sha = require_sha(release['source_sha'])
+    state, _ = read_state(repository, source_sha, api)
+    should_send = True
+    if state is not None:
+        if state['source_sha'] != source_sha or state['release']['source_sha'] != source_sha:
+            raise ValueError('Stored delivery does not match the requested commit')
+        if state['delivery']['pending_index'] is not None:
+            raise ValueError('Previous Telegram delivery outcome is unknown; inspect before retrying')
+        should_send = state['status'] != 'complete'
+        release_path.write_text(json.dumps(state['release'], ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    if output_file:
+        with output_file.open('a', encoding='utf-8') as stream:
+            stream.write(f'should_send={str(should_send).lower()}\n')
+    print(f'Delivery state refreshed: {"pending" if should_send else "already complete"}')
+    return should_send
 
 
 def add_metadata(artifacts, release_path, config_sha):
@@ -197,6 +220,10 @@ def main():
     checkpoint = commands.add_parser('save-state')
     checkpoint.add_argument('--release', type=Path, required=True)
     checkpoint.add_argument('--state', type=Path, required=True)
+    refresh = commands.add_parser('refresh-state')
+    refresh.add_argument('--release', type=Path, required=True)
+    refresh.add_argument('--state', type=Path, required=True)
+    refresh.add_argument('--github-output', type=Path)
     metadata = commands.add_parser('add-metadata')
     metadata.add_argument('--artifacts', type=Path, required=True)
     metadata.add_argument('--release', type=Path)
@@ -210,6 +237,8 @@ def main():
         raise ValueError('Invalid GitHub repository')
     if args.command == 'detect':
         detect(repository, args.output, args.github_output)
+    elif args.command == 'refresh-state':
+        refresh_state(repository, args.release, args.state, args.github_output)
     else:
         save_state(repository, args.release, args.state)
 
