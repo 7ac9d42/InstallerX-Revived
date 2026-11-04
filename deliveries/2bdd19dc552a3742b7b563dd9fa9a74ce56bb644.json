@@ -1,0 +1,18 @@
+{
+  "source_sha": "2bdd19dc552a3742b7b563dd9fa9a74ce56bb644",
+  "release": {
+    "id": 433909782,
+    "tag_name": "26.11.2bdd19d",
+    "html_url": "https://github.com/wxxsfxyzm/InstallerX-Revived/releases/tag/26.11.2bdd19d",
+    "body": "## 这是自动构建的最新测试版。\n- **这是一个预发布版本，并非为生产环境准备就绪。**\n- 我们非常鼓励您分享您的看法！\n\n## This is an automatically built latest Preview release.\n- **This is a pre-release version and is not intended for production use.**\n- We appreciate any feedback!\n\n**更新日志（Changelog）:**\n- i18n: Translations update from Hosted Weblate (#878) (Weblate (bot))\n- feat: Implement Shizuku non-ADB installation and optimize APK analysis (#895) (wxxsfxyzm)\n- chore(deps): update miuix to 0.9.4-ea2dbb3a-SNAPSHOT (wxxsfxyzm)\n- fix: pass saved color spec preference to Miuix (wxxsfxyzm)\n- fix(deps): update dependency com.diffplug.spotless:spotless-plugin-gradle to v8.11.0 (#894) (renovate[bot])\n\n**Full Changelog:** [`26.09...26.11.2bdd19d`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.11.2bdd19d)\n",
+    "source_sha": "2bdd19dc552a3742b7b563dd9fa9a74ce56bb644",
+    "changelog": "更新日志（Changelog）：\n- i18n: Translations update from Hosted Weblate (#878) (Weblate (bot))\n- feat: Implement Shizuku non-ADB installation and optimize APK analysis (#895) (wxxsfxyzm)\n- chore(deps): update miuix to 0.9.4-ea2dbb3a-SNAPSHOT (wxxsfxyzm)\n- fix: pass saved color spec preference to Miuix (wxxsfxyzm)\n- fix(deps): update dependency com.diffplug.spotless:spotless-plugin-gradle to v8.11.0 (#894) (renovate[bot])\n\n**Full Changelog:** [`26.09...26.11.2bdd19d`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.11.2bdd19d)"
+  },
+  "status": "pending",
+  "delivery": {
+    "next_index": 0,
+    "pending_index": 0,
+    "message_ids": [],
+    "payload_sha256": "68eb7f81cecb284b40c9e36c3074157b54e28c4cbae5048f64666599baca6ff5"
+  }
+}
