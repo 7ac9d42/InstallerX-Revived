@@ -8,7 +8,7 @@
     "source_sha": "2bdd19dc552a3742b7b563dd9fa9a74ce56bb644",
     "changelog": "更新日志（Changelog）：\n- i18n: Translations update from Hosted Weblate (#878) (Weblate (bot))\n- feat: Implement Shizuku non-ADB installation and optimize APK analysis (#895) (wxxsfxyzm)\n- chore(deps): update miuix to 0.9.4-ea2dbb3a-SNAPSHOT (wxxsfxyzm)\n- fix: pass saved color spec preference to Miuix (wxxsfxyzm)\n- fix(deps): update dependency com.diffplug.spotless:spotless-plugin-gradle to v8.11.0 (#894) (renovate[bot])\n\n**Full Changelog:** [`26.09...26.11.2bdd19d`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.11.2bdd19d)"
   },
-  "status": "pending",
+  "status": "complete",
   "delivery": {
     "next_index": 1,
     "pending_index": null,
