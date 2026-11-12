@@ -1,0 +1,18 @@
+{
+  "source_sha": "1f3f2a571bcb64c1c2f724455d38fa4336541178",
+  "release": {
+    "id": 442908835,
+    "tag_name": "26.11.1f3f2a5",
+    "html_url": "https://github.com/wxxsfxyzm/InstallerX-Revived/releases/tag/26.11.1f3f2a5",
+    "body": "## 这是自动构建的最新测试版。\n- **这是一个预发布版本，并非为生产环境准备就绪。**\n- 我们非常鼓励您分享您的看法！\n\n## This is an automatically built latest Preview release.\n- **This is a pre-release version and is not intended for production use.**\n- We appreciate any feedback!\n\n**更新日志（Changelog）:**\n- i18n: Translations update from Hosted Weblate (#897) (Weblate (bot))\n- feat(ui): add OS4 glass styling to Miuix settings (wxxsfxyzm)\n- fix: respect target user in uninstall requests (wxxsfxyzm)\n- fix(deps): update dependency org.jetbrains.kotlinx:kotlinx-serialization-json to v1.13.0 (#911) (renovate[bot])\n- chore(deps): update gradle to v9.9.1 (#908) (renovate[bot])\n\n**Full Changelog:** [`26.09...26.11.1f3f2a5`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.11.1f3f2a5)\n",
+    "source_sha": "1f3f2a571bcb64c1c2f724455d38fa4336541178",
+    "changelog": "更新日志（Changelog）：\n- i18n: Translations update from Hosted Weblate (#897) (Weblate (bot))\n- feat(ui): add OS4 glass styling to Miuix settings (wxxsfxyzm)\n- fix: respect target user in uninstall requests (wxxsfxyzm)\n- fix(deps): update dependency org.jetbrains.kotlinx:kotlinx-serialization-json to v1.13.0 (#911) (renovate[bot])\n- chore(deps): update gradle to v9.9.1 (#908) (renovate[bot])\n\n**Full Changelog:** [`26.09...26.11.1f3f2a5`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.11.1f3f2a5)"
+  },
+  "status": "pending",
+  "delivery": {
+    "next_index": 0,
+    "pending_index": 0,
+    "message_ids": [],
+    "payload_sha256": "4f4e1d2705dd8e0e9e79c44e1166a8f3dd9513b27b3894255abf6c229cd2038b"
+  }
+}
