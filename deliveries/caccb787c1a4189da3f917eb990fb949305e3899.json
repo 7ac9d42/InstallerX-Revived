@@ -10,9 +10,11 @@
   },
   "status": "pending",
   "delivery": {
-    "next_index": 0,
-    "pending_index": 0,
-    "message_ids": [],
+    "next_index": 1,
+    "pending_index": null,
+    "message_ids": [
+      28
+    ],
     "payload_sha256": "d9c6caed22b4b19a772096625903e3ec7f057f6e21399ee72edaef4a37323b30"
   }
 }
