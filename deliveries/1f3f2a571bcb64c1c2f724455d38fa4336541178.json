@@ -8,7 +8,7 @@
     "source_sha": "1f3f2a571bcb64c1c2f724455d38fa4336541178",
     "changelog": "更新日志（Changelog）：\n- i18n: Translations update from Hosted Weblate (#897) (Weblate (bot))\n- feat(ui): add OS4 glass styling to Miuix settings (wxxsfxyzm)\n- fix: respect target user in uninstall requests (wxxsfxyzm)\n- fix(deps): update dependency org.jetbrains.kotlinx:kotlinx-serialization-json to v1.13.0 (#911) (renovate[bot])\n- chore(deps): update gradle to v9.9.1 (#908) (renovate[bot])\n\n**Full Changelog:** [`26.09...26.11.1f3f2a5`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.11.1f3f2a5)"
   },
-  "status": "pending",
+  "status": "complete",
   "delivery": {
     "next_index": 1,
     "pending_index": null,
