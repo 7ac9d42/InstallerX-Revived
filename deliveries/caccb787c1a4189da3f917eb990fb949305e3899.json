@@ -8,7 +8,7 @@
     "source_sha": "caccb787c1a4189da3f917eb990fb949305e3899",
     "changelog": "更新日志（Changelog）：\n- fix: prevent crash when switching from Miuix to Material 3 (wxxsfxyzm)\n- i18n: Translations update from Hosted Weblate (#897) (Weblate (bot))\n- feat(ui): add OS4 glass styling to Miuix settings (wxxsfxyzm)\n- fix: respect target user in uninstall requests (wxxsfxyzm)\n- fix(deps): update dependency org.jetbrains.kotlinx:kotlinx-serialization-json to v1.13.0 (#911) (renovate[bot])\n\n**Full Changelog:** [`26.09...26.11.caccb78`](https://github.com/wxxsfxyzm/InstallerX-Revived/compare/26.09...26.11.caccb78)"
   },
-  "status": "pending",
+  "status": "complete",
   "delivery": {
     "next_index": 1,
     "pending_index": null,
